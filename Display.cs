@@ -318,86 +318,88 @@ namespace ConsoleTetris
         }
         public void DrawWithColor()
         {
+            char[,] playAreaCopy;
             lock (this)
             {
-                StringBuilder sb = new();
-                Console.ForegroundColor = ConsoleColor.Gray;
-                ConsoleColor lastColor = ConsoleColor.Gray;
+                playAreaCopy = (char[,])_playArea.Clone();
+            }
+            StringBuilder sb = new();
+            Console.ForegroundColor = ConsoleColor.Gray;
+            ConsoleColor lastColor = ConsoleColor.Gray;
+            sb.Append('|');
+            sb.Append(Enumerable.Repeat('-', s_totalWidht - 2).ToArray());
+            sb.Append('|');
+            sb.Append(Environment.NewLine);
+            for (int y = s_height - 1; y >= 0; y--)
+            {
                 sb.Append('|');
-                sb.Append(Enumerable.Repeat('-', s_totalWidht - 2).ToArray());
-                sb.Append('|');
-                sb.Append(Environment.NewLine);
-                for (int y = s_height - 1; y >= 0; y--)
+                for (int x = 0; x < s_playAreaWidth; x++)
                 {
-                    sb.Append('|');
-                    for (int x = 0; x < s_playAreaWidth; x++)
+                    char next = playAreaCopy[y, x];
+                    if (!_charColorMap.TryGetValue(next, out ConsoleColor color))
                     {
-                        char next = _playArea[y, x];
+                        color = ConsoleColor.Gray;
+                    }
+                    if (lastColor != color)
+                    {
+                        Console.Write(sb.ToString());
+                        lastColor = color;
+                        Console.ForegroundColor = color;
+                        sb.Clear();
+                    }
+
+                    sb.Append(next);
+                }
+                Console.Write(sb.ToString());
+                sb.Clear();
+                Console.ForegroundColor = ConsoleColor.Gray;
+                lastColor = ConsoleColor.Gray;
+                sb.Append('|');
+                for (int x = 0; x < s_scoreBoardWidth; x++)
+                {
+                    char next = _scoreBoard[y, x];
+                    if (y >= 3 && y < 7)
+                    {
                         if (!_charColorMap.TryGetValue(next, out ConsoleColor color))
                         {
                             color = ConsoleColor.Gray;
                         }
+
                         if (lastColor != color)
                         {
                             Console.Write(sb.ToString());
-                            lastColor = color;
                             Console.ForegroundColor = color;
+                            lastColor = color;
                             sb.Clear();
                         }
-                        
-                        sb.Append(next);
                     }
-                    Console.Write(sb.ToString());
-                    sb.Clear();
-                    Console.ForegroundColor = ConsoleColor.Gray;
-                    lastColor = ConsoleColor.Gray;
-                    sb.Append('|');
-                    for (int x = 0; x < s_scoreBoardWidth; x++)
+                    if (y == 7)
                     {
-                        char next = _scoreBoard[y, x];
-                        if (y >= 3 && y < 7)
-                        {
-                            if (!_charColorMap.TryGetValue(next, out ConsoleColor color))
-                            {
-                                color = ConsoleColor.Gray;
-                            }
+                        Console.ForegroundColor = ConsoleColor.Gray;
 
-                            if (lastColor != color)
-                            {
-                                Console.Write(sb.ToString());
-                                Console.ForegroundColor = color;
-                                lastColor = color;
-                                sb.Clear();
-                            }
-                        }
-                        if(y==7)
-                        {
-                            Console.ForegroundColor = ConsoleColor.Gray;
-                            
-                        }
-                        sb.Append(next);
                     }
-                    Console.ForegroundColor = ConsoleColor.Gray;
-                    lastColor = ConsoleColor.Gray;
-                    sb.Append('|');
-                sb.Append(Environment.NewLine);
+                    sb.Append(next);
                 }
-                sb.Append('|');
-                sb.Append("0123456789");
-                sb.Append(Enumerable.Repeat('-', s_totalWidht - 12).ToArray());
-
+                Console.ForegroundColor = ConsoleColor.Gray;
+                lastColor = ConsoleColor.Gray;
                 sb.Append('|');
                 sb.Append(Environment.NewLine);
-                Console.Write(sb.ToString());
             }
+            sb.Append('|');
+            sb.Append("0123456789");
+            sb.Append(Enumerable.Repeat('-', s_totalWidht - 12).ToArray());
+
+            sb.Append('|');
+            sb.Append(Environment.NewLine);
+            Console.Write(sb.ToString());
+
 
         }
         public void DrawWithoutColor()
         {
-            lock (this)
-            {
-                Console.Write(GetBuffer());
-            }
+
+            Console.Write(GetBuffer());
+
 
         }
     }

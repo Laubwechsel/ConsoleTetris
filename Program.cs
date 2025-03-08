@@ -80,29 +80,29 @@ namespace ConsoleTetris
             {
                 Console.SetBufferSize(Display.s_totalWidht + 1, Display.s_totalHeight + 2);
             }
-            display.DrawWithColor();
+            Globals.DrawFunction.Invoke();
             game.Start();
             inputThread.Start();
             Thread.Sleep(30);
 #if DEBUG
             int frameCounter = 0;
-            Stopwatch stopwatch = new Stopwatch();
 #endif
+            Stopwatch stopwatch = new Stopwatch();
             while (true)
             {
                 Console.SetCursorPosition(0, 0);
 #if DEBUG
-                stopwatch.Restart();
 #endif
+                stopwatch.Restart();
                 Globals.DrawFunction.Invoke();
-#if DEBUG
                 stopwatch.Stop();
+                Thread.Sleep(int.Clamp(10 - (int)stopwatch.ElapsedMilliseconds, 0, 10));
+#if DEBUG
                 Console.WriteLine(frameCounter);
                 Console.Write(stopwatch.ElapsedMilliseconds);
                 Console.Write("   ");
                 frameCounter++;
 #endif
-                Thread.Sleep(10);
             }
         }
         static void Tetris()

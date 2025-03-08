@@ -1,4 +1,5 @@
-﻿using System.Diagnostics.CodeAnalysis;
+﻿using System.Diagnostics;
+using System.Diagnostics.CodeAnalysis;
 
 namespace ConsoleTetris
 {
@@ -39,12 +40,27 @@ namespace ConsoleTetris
             CreateNextPiece();
             _stepThread = new Thread(() =>
             {
+                Stopwatch sw = new();
+                int lastStepTime;
+                int timeToSleep;
                 while (true)
                 {
                     while (Running)
                     {
-                        Thread.Sleep((int)(_tickDelay/_gameSpeed));
+                        sw.Restart();
                         Step();
+                        sw.Stop();
+                        lastStepTime = (int)sw.ElapsedMilliseconds;
+#if DEBUG
+                        string lastStepTimeString = lastStepTime.ToString();
+                        for (int i = 0; i < lastStepTimeString.Length; i++)
+                        {
+                            _display.DrawOnScoreBoard(i, 0, lastStepTimeString[i]);
+
+                        }
+#endif
+                        timeToSleep = (int)(_tickDelay / _gameSpeed);
+                        Thread.Sleep(int.Clamp(timeToSleep - lastStepTime, 0, timeToSleep));
                     }
                     _menu!.DisplayGameOver();
                     _gameReset.WaitOne();
@@ -137,13 +153,13 @@ namespace ConsoleTetris
                     switch (clearedLines)
                     {
                         case 1:
-                    Score += 100;
+                            Score += 100;
                             break;
                         case 2:
-                    Score += 250;
+                            Score += 250;
                             break;
                         case 3:
-                    Score += 400;
+                            Score += 400;
                             break;
                         default:
                             break;
@@ -169,7 +185,7 @@ namespace ConsoleTetris
                 if (_totalLinesCleared >= LevelBarrier(_level))
                 {
                     _level += 1;
-                    _gameSpeed =GameSpeedForLevel(_level);
+                    _gameSpeed = GameSpeedForLevel(_level);
                     _display.DrawLevel(_level);
                 }
             }
@@ -180,7 +196,7 @@ namespace ConsoleTetris
         }
         private int LevelBarrier(int level)
         {
-            return (int) (3f * MathF.Pow(level, 1.9f)) + 5;
+            return (int)(3f * MathF.Pow(level, 1.9f)) + 5;
         }
         [MemberNotNull(nameof(_currentPiece))]
         private void CreateNextPiece()

@@ -52,7 +52,7 @@ namespace ConsoleTetris
                         sw.Stop();
                         lastStepTime = (int)sw.ElapsedMilliseconds;
 #if DEBUG
-                        string lastStepTimeString = lastStepTime.ToString();
+                        string lastStepTimeString = _display.FormatNumber(lastStepTime);
                         for (int i = 0; i < lastStepTimeString.Length; i++)
                         {
                             _display.DrawOnScoreBoard(i, 0, lastStepTimeString[i]);
